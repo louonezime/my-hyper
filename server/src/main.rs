@@ -1,24 +1,29 @@
-use std::convert::Infallible;
-use std::net::SocketAddr;
+use std::env;
+use std::process;
 
-use hyper::service::{make_service_fn, service_fn};
-use hyper::{Body, Request, Response, Server};
+mod server;
 
-async fn hello(_req: Request<Body>) -> Result<Response<Body>, Infallible> {
-    Ok(Response::new(Body::from("Hello there")))
+macro_rules! ERROR_CODE {
+    () => { 84 };
 }
 
-#[tokio::main]
-async fn main() {
-    let sock_addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-
-    let make_servc = make_service_fn(|_conn| async {
-        Ok::<_, Infallible>(service_fn(hello))
-    });
-
-    let server = Server::bind(&sock_addr).serve(make_servc);
-
-    if let Err(e) = server.await {
-        eprintln!("Server Error: {}", e);
+fn usage(err_state: bool) {
+    if err_state == true {
+        eprintln!("CLIENT USAGE: ./server\n\tcargo run");
+        process::exit(ERROR_CODE!());
     }
+}
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    let mut err_state: bool = false;
+
+    match args.len() {
+        1 => server::create_serv(),
+        _ => {
+            eprintln!("Error: Too many arguments");
+            err_state = true;
+        }
+    }
+    usage(err_state);
 }
