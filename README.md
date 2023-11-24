@@ -4,7 +4,7 @@ Look into Rust in order to implement a reverse HTTP proxy.
 
 ### Installation
 
-If you want to create a executable, simply run the following command: 
+If you want to create a executable, simply run the following command:
 
 ```
 cargo build

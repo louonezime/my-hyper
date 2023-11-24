@@ -47,4 +47,5 @@ pub fn check_resources(
             resources_set.insert(script_elem.to_string());
         }
     }
+    print_resources
 }
