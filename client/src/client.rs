@@ -1,9 +1,4 @@
-use hyper::{
-    Client,
-    Response,
-    Body,
-    client::connect::HttpConnector
-};
+use hyper::{client::connect::HttpConnector, Body, Client, Response};
 use hyper_tls::HttpsConnector;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;

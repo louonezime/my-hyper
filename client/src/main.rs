@@ -1,8 +1,4 @@
-use std::{
-    env,
-    process,
-    ffi::OsString
-};
+use std::{env, ffi::OsString, process};
 
 mod client;
 

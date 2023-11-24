@@ -1,4 +1,4 @@
-use hyper::{Response, Body, StatusCode};
+use hyper::{Body, Response, StatusCode};
 
 pub fn not_found() -> Result<Response<Body>, hyper::Error> {
     let body = Body::from("Error 404 NOT FOUND: Path not recognised");

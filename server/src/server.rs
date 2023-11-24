@@ -1,15 +1,15 @@
 use hyper::header::REFERER;
-use hyper::{Body, Client, Request, Response, Server};
 use hyper::service::{make_service_fn, service_fn};
+use hyper::{Body, Client, Request, Response, Server};
 
 use hyper_tls::HttpsConnector;
 
 use std::net::SocketAddr;
-use std::sync::Arc;
 use std::str::FromStr;
+use std::sync::Arc;
 
-mod status;
 mod map;
+mod status;
 
 async fn _shutdown_signal() {
     tokio::signal::ctrl_c()
@@ -23,8 +23,14 @@ async fn handle_response(
 ) -> Result<Response<Body>, hyper::Error> {
     let target_response = client.request(req).await?;
 
-    println!("Target Server Response Status: {}", target_response.status());
-    println!("Target Server Response Headers: {:?}\n", target_response.headers());
+    println!(
+        "Target Server Response Status: {}",
+        target_response.status()
+    );
+    println!(
+        "Target Server Response Headers: {:?}\n",
+        target_response.headers()
+    );
 
     Ok(target_response)
 }
@@ -55,14 +61,14 @@ async fn reverse_proxy(
 async fn handle(
     req: Request<Body>,
     client: Arc<Client<HttpsConnector<hyper::client::HttpConnector>>>,
-    mut path: String
+    mut path: String,
 ) -> Result<Response<Body>, hyper::Error> {
     let req_headers = req.headers().clone();
 
     if let Some(ref_header) = req_headers.get(REFERER) {
         path = match ref_header.to_str() {
             Ok(res) => res.to_string(),
-            Err(_) => path
+            Err(_) => path,
         }
     }
     println!("Proxy Request Headers: {:?}\n", req_headers);
