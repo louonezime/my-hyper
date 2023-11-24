@@ -99,26 +99,3 @@ pub async fn create_serv() {
         eprintln!("Server Error: {}", e);
     }
 }
-
-// #[cfg(test)]
-// pub mod tests {
-//     use super::*;
-    // use tokio::runtime::Runtime;
-
-    // #[test]
-    // fn test_handle() {
-    //     let rt = Runtime::new().unwrap();
-
-    //     let request = Request::builder()
-    //         .method("GET")
-    //         .header("Authorization", "Basic dXNlcjpwYXNzd29yZA==")
-    //         .uri("/app2")
-    //         .body(Body::empty())
-    //         .unwrap();
-
-    //     let client = Arc::new(Client::builder().build::<_, hyper::Body>(HttpsConnector::new()));
-    //     let result = rt.block_on(handle(request, client.clone())).unwrap();
-
-    //     assert_eq!(result.status(), hyper::StatusCode::OK);
-    // }
-// }
