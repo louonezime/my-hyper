@@ -1,48 +1,43 @@
-use std::env;
-use std::process;
+use std::{
+    env,
+    process,
+    ffi::OsString
+};
 
 mod client;
 
-macro_rules! ERROR_CODE {
-    () => { 84 };
+static ERROR_CODE: i32 = 84;
+
+fn client_usage() {
+    eprintln!("CLIENT USAGE: ./client [url]\n\tcargo run [url]");
 }
 
-fn usage(err_state: bool) {
-    if err_state == true {
-        eprintln!("CLIENT USAGE: ./client [url]\n\tcargo run [url]");
-        process::exit(ERROR_CODE!());
+fn error_handling(url: OsString, mut args: env::ArgsOs) -> String {
+    if args.next().is_none() {
+        match url.into_string() {
+            Ok(url) => return url,
+            Err(_) => eprintln!("Error: Pass a valid HTTP URL as an argument"),
+        }
+    } else {
+        eprintln!("Error: Too many arguments");
     }
-}
 
-fn error_handling() -> String {
-    let args: Vec<String> = env::args().collect();
-    let mut url = String::from("");
-    let mut err_state: bool = false;
-
-    match args.len() {
-        1 => {
-            eprintln!("Error: Too few arguments");
-            err_state = true;
-        }
-        2 => {
-            url = match env::args().nth(1) {
-                Some(url) => url,
-                None => {
-                    eprintln!("Error: Pass a valid HTTP URL as an argument");
-                    process::exit(ERROR_CODE!());
-                }
-            };
-        }
-        _ => {
-            eprintln!("Error: Too many arguments");
-            err_state = true;
-        }
-    }
-    usage(err_state);
-    url
+    client_usage();
+    process::exit(ERROR_CODE);
 }
 
 fn main() {
-    let url = error_handling();
-    let _ = client::packet_response(&url);
+    let mut args = env::args_os();
+    args.next();
+
+    if let Some(res) = args.next() {
+        let url = error_handling(res, args);
+        let _ = client::packet_response(&url);
+        return;
+    } else {
+        eprintln!("Error: Too few arguments");
+    }
+
+    client_usage();
+    process::exit(ERROR_CODE);
 }

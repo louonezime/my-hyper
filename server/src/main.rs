@@ -1,29 +1,24 @@
-use std::env;
-use std::process;
+use std::{env, process};
 
 mod server;
 
-macro_rules! ERROR_CODE {
-    () => { 84 };
-}
+static ERROR_CODE: i32 = 84;
 
-fn usage(err_state: bool) {
-    if err_state == true {
-        eprintln!("CLIENT USAGE: ./server\n\tcargo run");
-        process::exit(ERROR_CODE!());
-    }
+fn server_usage() {
+    eprintln!("CLIENT USAGE: ./server\n\tcargo run");
 }
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    let mut err_state: bool = false;
+    let mut args = env::args_os();
+    args.next();
 
-    match args.len() {
-        1 => server::create_serv(),
-        _ => {
+    if let Some(os_mode) = args.next() {
+        if let Ok(_) = os_mode.into_string() {
             eprintln!("Error: Too many arguments");
-            err_state = true;
+            server_usage();
+            process::exit(ERROR_CODE);
         }
     }
-    usage(err_state);
+
+    server::create_serv();
 }

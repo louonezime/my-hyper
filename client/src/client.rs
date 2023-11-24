@@ -21,7 +21,6 @@ fn print_result(res: Response<Body>) {
     println!("Response: {}", res.status());
     println!("Headers: {:#?}", res.headers());
     println!("Version: {:?}", res.version());
-    // May be useful, but always prints Extensions
     println!("Extensions: {:?}", res.extensions());
 }
 
