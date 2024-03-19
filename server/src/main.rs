@@ -13,7 +13,7 @@ fn main() {
     args.next();
 
     if let Some(os_mode) = args.next() {
-        if let Ok(_) = os_mode.into_string() {
+        if os_mode.into_string().is_ok() {
             eprintln!("Error: Too many arguments");
             server_usage();
             process::exit(ERROR_CODE);

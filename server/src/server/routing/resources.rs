@@ -4,6 +4,7 @@ use std::sync::{Arc, Mutex};
 use std::collections::HashSet;
 
 mod scripts;
+
 pub mod lib;
 
 fn check_script(document: Html) -> Vec<Option<String>> {
@@ -23,7 +24,8 @@ fn check_script(document: Html) -> Vec<Option<String>> {
 }
 
 pub fn check_resources(
-    full_body_str: &String, resources: &Arc<Mutex<HashSet<String>>>) {
+    full_body_str: &String, resources: &Arc<Mutex<HashSet<String>>>
+) {
     let document = Html::parse_document(&full_body_str);
 
     let src_parser = Selector::parse("[src]").unwrap();
@@ -41,6 +43,7 @@ pub fn check_resources(
             resources_set.insert(href.to_string());
         }
     }
+
     let script = check_script(document.clone());
     for result in script {
         if let Some(script_elem) = result {

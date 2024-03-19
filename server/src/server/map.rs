@@ -13,11 +13,23 @@ static GLOBAL_MAP: Lazy<Mutex<GlobalHashMap>> = Lazy::new(|| {
     map.insert("/bastion".to_string(), "https://10.10.176.126/".to_string());
     map.insert("/app2".to_string(), "https://demoqa.com/".to_string());
     map.insert("/git".to_string(), "https://github.com/".to_string());
-    map.insert("/simple".to_string(), "http://www.columbia.edu/~fdc/sample.html".to_string());
+    map.insert(
+        "/simple".to_string(),
+        "http://www.columbia.edu/~fdc/sample.html".to_string(),
+    );
     map.insert("/def".to_string(), "https://httpbin.org/".to_string());
-    map.insert("/auth".to_string(), "https://httpbin.org/basic-auth/foo/bar".to_string());
-    map.insert("/art".to_string(), "https://www.luxinyaoportfolio.com/".to_string());
-    map.insert("/rand".to_string(), "https://www.ryanhaskins.com/".to_string());
+    map.insert(
+        "/auth".to_string(),
+        "https://httpbin.org/basic-auth/foo/bar".to_string(),
+    );
+    map.insert(
+        "/art".to_string(),
+        "https://www.luxinyaoportfolio.com/".to_string(),
+    );
+    map.insert(
+        "/rand".to_string(),
+        "https://www.ryanhaskins.com/".to_string(),
+    );
     Mutex::new(map)
 });
 
@@ -43,9 +55,8 @@ pub fn match_servers(path: &str) -> Option<String> {
     None
 }
 
-
 pub fn find_resources_refs(referer: &str, subpath: &str) -> Option<String> {
-    match_servers(&referer).map(|ref_host| {
+    match_servers(referer).map(|ref_host| {
         let target_url = if ref_host.ends_with('/') {
             let (tmp, _) = ref_host.split_at(ref_host.len() - 1);
             format!("{}{}", tmp, subpath)
@@ -57,8 +68,7 @@ pub fn find_resources_refs(referer: &str, subpath: &str) -> Option<String> {
 }
 
 pub fn determine_target(path_ref: String, req_uri: &hyper::Uri) -> Result<String, ()> {
-
-    if req_uri.path().starts_with("/") {
+    if req_uri.path().starts_with('/') {
         Ok(match match_servers(req_uri.path()) {
             Some(proxy_path) => proxy_path,
             _ => {

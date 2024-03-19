@@ -1,8 +1,4 @@
-use std::{
-    env,
-    process,
-    ffi::OsString
-};
+use std::{env, ffi::OsString, process};
 
 mod client;
 
@@ -26,13 +22,18 @@ fn error_handling(url: OsString, mut args: env::ArgsOs) -> String {
     process::exit(ERROR_CODE);
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut args = env::args_os();
+
     args.next();
 
     if let Some(res) = args.next() {
         let url = error_handling(res, args);
-        let _ = client::packet_response(&url);
+        if let Err(err) = client::packet_response(&url).await {
+            eprintln!("Error: {}", err);
+            return;
+        }
         return;
     } else {
         eprintln!("Error: Too few arguments");

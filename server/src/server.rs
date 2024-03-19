@@ -1,17 +1,17 @@
 use hyper::header::REFERER;
-use hyper::{Body, Client, Request, Response, Server};
 use hyper::service::{make_service_fn, service_fn};
+use hyper::{Body, Client, Request, Response, Server};
 
 use hyper_tls::HttpsConnector;
 
 use std::net::SocketAddr;
-use std::sync::Arc;
 use std::str::FromStr;
+use std::sync::Arc;
 
-mod status;
 mod map;
+mod status;
 
-async fn _shutdown_signal() {
+async fn shutdown_signal() {
     tokio::signal::ctrl_c()
         .await
         .expect("failed to install CTRL+C signal handler");
@@ -23,8 +23,14 @@ async fn handle_response(
 ) -> Result<Response<Body>, hyper::Error> {
     let target_response = client.request(req).await?;
 
-    println!("Target Server Response Status: {}", target_response.status());
-    println!("Target Server Response Headers: {:?}\n", target_response.headers());
+    println!(
+        "Target Server Response Status: {}",
+        target_response.status()
+    );
+    println!(
+        "Target Server Response Headers: {:?}\n",
+        target_response.headers()
+    );
 
     Ok(target_response)
 }
@@ -55,14 +61,14 @@ async fn reverse_proxy(
 async fn handle(
     req: Request<Body>,
     client: Arc<Client<HttpsConnector<hyper::client::HttpConnector>>>,
-    mut path: String
+    mut path: String,
 ) -> Result<Response<Body>, hyper::Error> {
     let req_headers = req.headers().clone();
 
-    if let Some(ref_header) = req_headers.get(REFERER) {
+    if let Some(ref_header) = req_headers.get(REFERER) { // Refactor for cases with wrong referers
         path = match ref_header.to_str() {
             Ok(res) => res.to_string(),
-            Err(_) => path
+            Err(_) => path,
         }
     }
     println!("Proxy Request Headers: {:?}\n", req_headers);
@@ -81,7 +87,6 @@ pub async fn create_serv() {
 
     let make_svc = make_service_fn(move |_conn| {
         let client = client_for_service.clone();
-
         async {
             Ok::<_, hyper::Error>(service_fn(move |req| {
                 let client = client.clone();
@@ -93,9 +98,12 @@ pub async fn create_serv() {
         }
     });
     let server = Server::bind(&addr).serve(make_svc);
+    let graceful_shutdown = server.with_graceful_shutdown(shutdown_signal());
 
     println!("Reverse proxy listening on http://{}", addr);
-    if let Err(e) = server.await {
+    if let Err(e) = graceful_shutdown.await {
         eprintln!("Server Error: {}", e);
+    } else {
+        println!("\nServer shutdown gracefully!");
     }
 }

@@ -1,19 +1,18 @@
-use hyper::{Client, Response, Body};
-use hyper::client::connect::HttpConnector;
+use hyper::{client::connect::HttpConnector, Body, Client, Response};
 use hyper_tls::HttpsConnector;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
-#[tokio::main]
 pub async fn packet_response(url: &str) -> Result<()> {
-    let url = url.parse::<hyper::Uri>().unwrap();
-    if url.scheme_str() == Some("https") {
-        fetch_secured_url(url).await
-    } else if url.scheme_str() == Some("http") {
-        fetch_url(url).await
-    } else {
-        eprintln!("Error: Pass a valid HTTP URL as an argument");
-        Ok(())
+    let url = url.parse::<hyper::Uri>()?;
+
+    match url.scheme_str() {
+        Some("https") => fetch_secured_url(url).await,
+        Some("http") => fetch_url(url).await,
+        _ => {
+            eprintln!("Error: Pass a valid HTTP URL as an argument");
+            Ok(())
+        }
     }
 }
 
