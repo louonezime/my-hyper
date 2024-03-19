@@ -4,7 +4,7 @@ use std::collections::HashSet;
 
 fn ref_parsing(hreference_list: HashSet<String>, path: &str) {
     for href in hreference_list {
-        print!("{href}, ");
+        print!("{}, ", href);
     }
 }
 
